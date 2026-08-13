@@ -22,7 +22,6 @@
   --c-green-bg:  #f6ffed;
   --c-blue-bg:   #e6f4ff;
   --c-purple-bg: #f9f0ff;
-  --asset-colors: #1677ff, #f97316, #389e0d, #722ed1, #13c2c2, #eb2f96;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,21 +34,6 @@ body {
   color: var(--text);
 }
 
-/* ── Load bar (top) ────────────────────────── */
-.topbar {
-  max-width: 880px; margin: 0 auto 16px;
-  display: flex; justify-content: flex-end; gap: 8px;
-}
-.btn-load {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 6px 14px;
-  font-size: 13px; color: var(--muted); cursor: pointer;
-  transition: all .15s;
-}
-.btn-load:hover { border-color: var(--c-blue); color: var(--c-blue); }
-#fileInput { display: none; }
-
-/* ── Main card ─────────────────────────────── */
 .card {
   max-width: 880px; margin: 0 auto;
   background: var(--card);
@@ -58,7 +42,6 @@ body {
   box-shadow: 0 2px 16px rgba(0,0,0,.07);
 }
 
-/* ── Header ────────────────────────────────── */
 .card-title {
   font-size: 22px; font-weight: 700; color: var(--text);
   margin-bottom: 6px; letter-spacing: -.01em;
@@ -67,7 +50,6 @@ body {
   font-size: 13px; color: var(--muted); margin-bottom: 24px;
 }
 
-/* ── Score cards ───────────────────────────── */
 .scores-row {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -106,7 +88,6 @@ body {
 .bg-blue   { background: var(--c-blue-bg);   color: var(--c-blue);   }
 .bg-purple { background: var(--c-purple-bg); color: var(--c-purple); }
 
-/* ── Legend bands ──────────────────────────── */
 .bands { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .band {
   padding: 9px 16px; border-radius: 8px;
@@ -118,13 +99,11 @@ body {
 .band-blue   { background: var(--c-blue-bg);   color: var(--c-blue);   }
 .band-purple { background: var(--c-purple-bg); color: var(--c-purple); }
 
-/* ── Warning note ──────────────────────────── */
 .note {
   font-size: 12px; color: #d48806;
   margin-bottom: 20px; display: flex; align-items: center; gap: 5px;
 }
 
-/* ── Time filter pills ─────────────────────── */
 .filter-row {
   display: flex; gap: 8px; margin-bottom: 20px;
 }
@@ -139,226 +118,96 @@ body {
   background: #1a3a5c; border-color: #1a3a5c; color: #fff;
 }
 
-/* ── Chart ─────────────────────────────────── */
 .chart-box { position: relative; height: 300px; }
-
-/* ── Empty state ───────────────────────────── */
-#emptyState {
-  text-align: center; padding: 48px 0;
-}
-#emptyState .empty-icon { font-size: 48px; margin-bottom: 12px; }
-#emptyState h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-#emptyState p { color: var(--muted); font-size: 14px; line-height: 1.6; }
-.steps-box {
-  background: var(--bg); border-radius: 10px;
-  padding: 16px 20px; text-align: left; margin: 20px auto;
-  max-width: 440px; font-size: 13px;
-}
-.steps-box .step { display: flex; gap: 10px; margin-bottom: 8px; color: #444; }
-.step-n {
-  width: 20px; height: 20px; border-radius: 50%;
-  background: var(--c-blue); color: #fff;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-code {
-  background: #eef0f2; padding: 1px 5px; border-radius: 3px; font-size: 12px;
-}
-.btn-pick {
-  display: inline-block; margin-top: 8px;
-  background: var(--c-blue); color: #fff;
-  border: none; border-radius: 8px;
-  padding: 10px 24px; font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: background .15s;
-}
-.btn-pick:hover { background: #0958d9; }
-
-/* ── Toast ─────────────────────────────────── */
-#toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: #1a1a2e; color: #fff;
-  padding: 10px 18px; border-radius: 10px;
-  font-size: 13px; z-index: 999;
-  opacity: 0; transform: translateY(6px);
-  transition: all .25s; pointer-events: none;
-}
-#toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- ── Top bar ───────────────────────────── -->
-<div class="topbar">
-  <button class="btn-load" onclick="document.getElementById('fileInput').click()">
-    ＋ 加载 / 更新数据
-  </button>
-  <button class="btn-load" onclick="clearData()">清除缓存</button>
-  <input type="file" id="fileInput" accept=".json" onchange="handleFile(this)">
-</div>
-
-<!-- ── Main card ─────────────────────────── -->
 <div class="card">
   <div class="card-title">量化大类资产打分走势</div>
   <div class="card-subtitle">
     数据来源：雪球 UID 1811437308 &nbsp;·&nbsp; 最新数据：<span id="latestDate">—</span>
   </div>
 
-  <!-- Empty state (shown when no data) -->
-  <div id="emptyState">
-    <div class="empty-icon">📊</div>
-    <h3>暂无数据</h3>
-    <p>请先运行抓取脚本，然后加载生成的 JSON 文件</p>
-    <div class="steps-box">
-      <div class="step"><span class="step-n">1</span><span>安装依赖：<code>python3 -m pip install DrissionPage requests</code></span></div>
-      <div class="step"><span class="step-n">2</span><span>运行脚本：<code>python3 scrape_xueqiu.py</code></span></div>
-      <div class="step"><span class="step-n">3</span><span>点击下方按钮选择生成的 <code>xueqiu_data.json</code></span></div>
-    </div>
-    <button class="btn-pick" onclick="document.getElementById('fileInput').click()">📂 选择 JSON 文件</button>
+  <div class="scores-row" id="scoresRow"></div>
+
+  <div class="bands">
+    <div class="band band-red">≤ 3分 — 熊尾牛初，满仓/可加杠杆</div>
+    <div class="band band-orange">3–5分 — 熊市中期，累进加仓</div>
+    <div class="band band-green">5–7分 — 正常区间，持有观察</div>
+    <div class="band band-blue">7–8分 — 牛市中期，停止定投</div>
+    <div class="band band-purple">≥ 8分 — 牛市信号，累进减仓至空仓</div>
   </div>
 
-  <!-- Dashboard (shown when data loaded) -->
-  <div id="dashboard" style="display:none">
-    <!-- Current scores -->
-    <div class="scores-row" id="scoresRow"></div>
+  <div class="note">⚠ 分数越低代表估值越低、性价比越高</div>
 
-    <!-- Legend bands -->
-    <div class="bands">
-      <div class="band band-red">≤ 3分 — 熊尾牛初，满仓/可加杠杆</div>
-      <div class="band band-orange">3–5分 — 熊市中期，累进加仓</div>
-      <div class="band band-green">5–7分 — 正常区间，持有观察</div>
-      <div class="band band-blue">7–8分 — 牛市中期，停止定投</div>
-      <div class="band band-purple">≥ 8分 — 牛市信号，累进减仓至空仓</div>
-    </div>
+  <div class="filter-row">
+    <button class="pill active" onclick="setRange('3m', this)">近3个月</button>
+    <button class="pill" onclick="setRange('1y', this)">近1年</button>
+    <button class="pill" onclick="setRange('all', this)">全部</button>
+  </div>
 
-    <div class="note">⚠ 分数越低代表估值越低、性价比越高</div>
-
-    <!-- Time filter -->
-    <div class="filter-row">
-      <button class="pill active" onclick="setRange('3m', this)">近3个月</button>
-      <button class="pill" onclick="setRange('1y', this)">近1年</button>
-      <button class="pill" onclick="setRange('all', this)">全部</button>
-    </div>
-
-    <!-- Chart -->
-    <div class="chart-box">
-      <canvas id="mainChart"></canvas>
-    </div>
+  <div class="chart-box">
+    <canvas id="mainChart"></canvas>
   </div>
 </div>
 
-<div id="toast"></div>
-
 <script>
-// ── Constants ────────────────────────────────────────
-const LS_KEY = 'xueqiu_1811437308_v2';
 const ASSET_COLORS = ['#1677ff','#f97316','#389e0d','#722ed1','#13c2c2','#eb2f96','#fa8c16','#52c41a'];
-// 只在页面展示这两个资产（其余数据仍保存在 JSON 里）
 const SHOW_ASSETS  = ['纳斯达克', '红利低波'];
 const BANDS = [
-  { max: 3,  cls: 'bg-red',    label: '熊尾牛初·满仓/可加杠杆' },
-  { max: 5,  cls: 'bg-orange', label: '熊市中期·累进加仓' },
-  { max: 7,  cls: 'bg-green',  label: '正常区间·持有观察' },
-  { max: 8,  cls: 'bg-blue',   label: '牛市中期·停止定投' },
-  { max: 999,cls: 'bg-purple', label: '牛市信号·累进减仓至空仓' },
+  { max: 3,   cls: 'bg-red',    label: '熊尾牛初·满仓/可加杠杆' },
+  { max: 5,   cls: 'bg-orange', label: '熊市中期·累进加仓' },
+  { max: 7,   cls: 'bg-green',  label: '正常区间·持有观察' },
+  { max: 8,   cls: 'bg-blue',   label: '牛市中期·停止定投' },
+  { max: 999, cls: 'bg-purple', label: '牛市信号·累进减仓至空仓' },
 ];
 const VALUE_CLS = ['c-red','c-orange','c-green','c-blue','c-purple'];
 
-let rawData  = null;   // full JSON from scraper
-let assets   = {};     // { assetName: [{date, score}] }
-let chart    = null;
+const RAW_POSTS = [{"date":"2025-10-24","scores":[{"name":"纳斯达克","score":7.93},{"name":"沪深300","score":7.92},{"name":"中期国债","score":3.5}]},{"date":"2025-10-27","scores":[{"name":"纳斯达克","score":8.1},{"name":"沪深300","score":8.43},{"name":"中期国债","score":3.73}]},{"date":"2025-10-28","scores":[{"name":"纳斯达克","score":8.21},{"name":"沪深300","score":8.26},{"name":"中期国债","score":4.35}]},{"date":"2025-10-29","scores":[{"name":"纳斯达克","score":8.08},{"name":"沪深300","score":8.13},{"name":"中期国债","score":4.27}]},{"date":"2025-10-30","scores":[{"name":"纳斯达克","score":8.37},{"name":"沪深300","score":8.11},{"name":"中期国债","score":4.56}]},{"date":"2025-10-31","scores":[{"name":"纳斯达克","score":8.09},{"name":"沪深300","score":7.46},{"name":"中期国债","score":4.9}]},{"date":"2025-11-03","scores":[{"name":"纳斯达克","score":8.27},{"name":"沪深300","score":7.42},{"name":"中期国债","score":4.49}]},{"date":"2025-11-04","scores":[{"name":"纳斯达克","score":6.97},{"name":"沪深300","score":7.28},{"name":"中期国债","score":4.52}]},{"date":"2025-11-05","scores":[{"name":"纳斯达克","score":7.93},{"name":"沪深300","score":7.26},{"name":"中期国债","score":4.52}]},{"date":"2025-11-06","scores":[{"name":"纳斯达克","score":6.68},{"name":"沪深300","score":7.85},{"name":"中期国债","score":4.16}]},{"date":"2025-11-07","scores":[{"name":"纳斯达克","score":6.69},{"name":"沪深300","score":7.61},{"name":"中期国债","score":4.31}]},{"date":"2025-11-10","scores":[{"name":"纳斯达克","score":6.9},{"name":"沪深300","score":7.89},{"name":"中期国债","score":3.99}]},{"date":"2025-11-11","scores":[{"name":"纳斯达克","score":7.43},{"name":"沪深300","score":7.58},{"name":"中期国债","score":4.14}]},{"date":"2025-11-12","scores":[{"name":"纳斯达克","score":7.42},{"name":"沪深300","score":7.64},{"name":"中期国债","score":4.24}]},{"date":"2025-11-13","scores":[{"name":"纳斯达克","score":6.74},{"name":"沪深300","score":7.93},{"name":"中期国债","score":4.0}]},{"date":"2025-11-14","scores":[{"name":"纳斯达克","score":6.52},{"name":"沪深300","score":7.45},{"name":"中期国债","score":4.15}]},{"date":"2025-11-17","scores":[{"name":"纳斯达克","score":6.48},{"name":"沪深300","score":7.19},{"name":"中期国债","score":4.34}]},{"date":"2025-11-18","scores":[{"name":"纳斯达克","score":5.82},{"name":"沪深300","score":6.91},{"name":"中期国债","score":4.45}]},{"date":"2025-11-19","scores":[{"name":"纳斯达克","score":5.92},{"name":"沪深300","score":7.13},{"name":"中期国债","score":4.24}]},{"date":"2025-11-20","scores":[{"name":"纳斯达克","score":5.28},{"name":"沪深300","score":6.08},{"name":"中期国债","score":4.45}]},{"date":"2025-11-21","scores":[{"name":"纳斯达克","score":5.46},{"name":"沪深300","score":5.85},{"name":"中期国债","score":4.65}]},{"date":"2025-11-25","scores":[{"name":"纳斯达克","score":6.3},{"name":"沪深300","score":6.19},{"name":"中期国债","score":4.43}]},{"date":"2025-11-25","scores":[{"name":"纳斯达克","score":5.99},{"name":"沪深300","score":5.35},{"name":"中期国债","score":4.92}]},{"date":"2025-11-26","scores":[{"name":"纳斯达克","score":6.55},{"name":"沪深300","score":5.93},{"name":"中期国债","score":4.14}]},{"date":"2025-11-27","scores":[{"name":"纳斯达克","score":6.59},{"name":"沪深300","score":6.1},{"name":"中期国债","score":4.25}]},{"date":"2025-11-28","scores":[{"name":"纳斯达克","score":6.53},{"name":"沪深300","score":6.01},{"name":"中期国债","score":4.42}]},{"date":"2025-12-01","scores":[{"name":"纳斯达克","score":6.93},{"name":"沪深300","score":6.16},{"name":"中期国债","score":4.76}]},{"date":"2025-12-02","scores":[{"name":"纳斯达克","score":7.4},{"name":"沪深300","score":5.66},{"name":"中期国债","score":4.67}]},{"date":"2025-12-03","scores":[{"name":"纳斯达克","score":7.46},{"name":"沪深300","score":6.06},{"name":"中期国债","score":4.52}]},{"date":"2025-12-04","scores":[{"name":"纳斯达克","score":7.59},{"name":"沪深300","score":6.07},{"name":"中期国债","score":3.91}]},{"date":"2025-12-19","scores":[{"name":"纳斯达克","score":7.03},{"name":"沪深300","score":5.71},{"name":"中期国债","score":4.86}]},{"date":"2025-12-22","scores":[{"name":"纳斯达克","score":7.13},{"name":"沪深300","score":6.15},{"name":"中期国债","score":4.5}]},{"date":"2025-12-23","scores":[{"name":"纳斯达克","score":7.82},{"name":"沪深300","score":6.53},{"name":"中期国债","score":4.83}]},{"date":"2025-12-24","scores":[{"name":"纳斯达克","score":7.84},{"name":"沪深300","score":6.68},{"name":"中期国债","score":4.69}]},{"date":"2025-12-25","scores":[{"name":"沪深300","score":6.92},{"name":"中期国债","score":4.55}]},{"date":"2025-12-26","scores":[{"name":"纳斯达克","score":7.81},{"name":"沪深300","score":7.22},{"name":"中期国债","score":4.76}]},{"date":"2025-12-29","scores":[{"name":"纳斯达克","score":7.61},{"name":"沪深300","score":6.94},{"name":"中期国债","score":4.19}]},{"date":"2025-12-30","scores":[{"name":"纳斯达克","score":6.99},{"name":"沪深300","score":7.03},{"name":"中期国债","score":4.1}]},{"date":"2025-12-31","scores":[{"name":"纳斯达克","score":6.72},{"name":"沪深300","score":6.85},{"name":"中期国债","score":4.15}]},{"date":"2026-01-05","scores":[{"name":"纳斯达克","score":7.03},{"name":"沪深300","score":7.55},{"name":"中期国债","score":3.35}]},{"date":"2026-01-06","scores":[{"name":"纳斯达克","score":7.07},{"name":"沪深300","score":7.7},{"name":"中期国债","score":2.54}]},{"date":"2026-01-07","scores":[{"name":"纳斯达克","score":7.28},{"name":"沪深300","score":7.95},{"name":"中期国债","score":2.57}]},{"date":"2026-01-08","scores":[{"name":"纳斯达克","score":7.57},{"name":"沪深300","score":7.5},{"name":"中期国债","score":3.15}]},{"date":"2026-01-09","scores":[{"name":"纳斯达克","score":7.97},{"name":"沪深300","score":7.2},{"name":"中期国债","score":3.87}]},{"date":"2026-01-12","scores":[{"name":"纳斯达克","score":7.58},{"name":"沪深300","score":7.85},{"name":"中期国债","score":3.43}]},{"date":"2026-01-13","scores":[{"name":"纳斯达克","score":7.41},{"name":"沪深300","score":7.64},{"name":"中期国债","score":3.81}]},{"date":"2026-01-14","scores":[{"name":"纳斯达克","score":7.12},{"name":"沪深300","score":7.49},{"name":"红利低波","score":3.1},{"name":"中期国债","score":3.9}]},{"date":"2026-01-15","scores":[{"name":"纳斯达克","score":7.25},{"name":"沪深300","score":7.54},{"name":"中期国债","score":4.24},{"name":"红利低波","score":2.99},{"name":"现货黄金","score":7.62}]},{"date":"2026-01-16","scores":[{"name":"纳斯达克","score":7.97},{"name":"沪深300","score":7.27},{"name":"中期国债","score":4.59},{"name":"红利低波","score":2.49},{"name":"现货黄金","score":7.65}]},{"date":"2026-01-19","scores":[{"name":"纳斯达克","score":7.73},{"name":"沪深300","score":7.05},{"name":"中期国债","score":4.36},{"name":"红利低波","score":3.1},{"name":"现货黄金","score":7.89}]},{"date":"2026-01-20","scores":[{"name":"纳斯达克","score":8.81},{"name":"沪深300","score":7.37},{"name":"中期国债","score":4.64},{"name":"红利低波","score":4.6},{"name":"现货黄金","score":8.06}]},{"date":"2026-01-21","scores":[{"name":"纳斯达克","score":7.53},{"name":"沪深300","score":7.29},{"name":"中期国债","score":4.74},{"name":"红利低波","score":3.34},{"name":"现货黄金","score":8.04}]},{"date":"2026-01-22","scores":[{"name":"纳斯达克","score":7.07},{"name":"沪深300","score":7.29},{"name":"中期国债","score":4.69},{"name":"红利低波","score":3.5},{"name":"现货黄金","score":7.07}]},{"date":"2026-01-23","scores":[{"name":"纳斯达克","score":7.31},{"name":"沪深300","score":7.1},{"name":"中期国债","score":4.81},{"name":"红利低波","score":3.14},{"name":"现货黄金","score":7.35}]},{"date":"2026-01-26","scores":[{"name":"纳斯达克","score":7.43},{"name":"沪深300","score":7.16},{"name":"中期国债","score":4.5},{"name":"红利低波","score":3.71},{"name":"现货黄金","score":7.53}]},{"date":"2026-01-27","scores":[{"name":"纳斯达克","score":8.39},{"name":"沪深300","score":7.03},{"name":"中期国债","score":4.51},{"name":"现货黄金","score":7.69},{"name":"红利低波","score":3.6},{"name":"长江电力","score":2.2}]},{"date":"2026-01-28","scores":[{"name":"纳斯达克","score":8.19},{"name":"沪深300","score":7.09},{"name":"中期国债","score":4.5},{"name":"现货黄金","score":7.73},{"name":"红利低波","score":3.42},{"name":"长江电力","score":2.16}]},{"date":"2026-01-29","scores":[{"name":"纳斯达克","score":7.52},{"name":"沪深300","score":7.28},{"name":"中期国债","score":4.43},{"name":"现货黄金","score":7.76},{"name":"红利低波","score":4.74},{"name":"长江电力","score":2.34}]},{"date":"2026-01-30","scores":[{"name":"纳斯达克","score":7.17},{"name":"沪深300","score":7.23},{"name":"中期国债","score":4.4},{"name":"现货黄金","score":6.75},{"name":"红利低波","score":4.67},{"name":"长江电力","score":2.69}]},{"date":"2026-02-02","scores":[{"name":"纳斯达克","score":7.46},{"name":"沪深300","score":5.48},{"name":"中期国债","score":4.42},{"name":"现货黄金","score":5.36},{"name":"红利低波","score":3.32},{"name":"长江电力","score":2.51}]},{"date":"2026-02-03","scores":[{"name":"纳斯达克","score":6.76},{"name":"沪深300","score":6.09},{"name":"中期国债","score":4.45},{"name":"现货黄金","score":5.96},{"name":"红利低波","score":3.16},{"name":"长江电力","score":2.42}]},{"date":"2026-02-04","scores":[{"name":"纳斯达克","score":6.29},{"name":"沪深300","score":6.93},{"name":"中期国债","score":4.2},{"name":"现货黄金","score":6.79},{"name":"红利低波","score":5.59},{"name":"长江电力","score":2.7}]},{"date":"2026-02-05","scores":[{"name":"纳斯达克","score":5.53},{"name":"沪深300","score":6.35},{"name":"中期国债","score":4.35},{"name":"现货黄金","score":6.39},{"name":"红利低波","score":5.58},{"name":"长江电力","score":2.95}]},{"date":"2026-02-06","scores":[{"name":"纳斯达克","score":6.02},{"name":"沪深300","score":6.33},{"name":"中期国债","score":4.37},{"name":"现货黄金","score":6.22},{"name":"红利低波","score":5.27},{"name":"长江电力","score":2.85}]},{"date":"2026-02-09","scores":[{"name":"纳斯达克","score":6.42},{"name":"沪深300","score":6.48},{"name":"中期国债","score":4.55},{"name":"现货黄金","score":6.75},{"name":"红利低波","score":5.76},{"name":"长江电力","score":2.87}]},{"date":"2026-02-10","scores":[{"name":"纳斯达克","score":6.28},{"name":"沪深300","score":7.17},{"name":"中期国债","score":4.7},{"name":"现货黄金","score":6.9},{"name":"红利低波","score":6.09},{"name":"长江电力","score":2.93}]},{"date":"2026-02-11","scores":[{"name":"纳斯达克","score":6.37},{"name":"沪深300","score":7.21},{"name":"中期国债","score":4.74},{"name":"现货黄金","score":6.99},{"name":"红利低波","score":6.2},{"name":"长江电力","score":2.85}]},{"date":"2026-02-12","scores":[{"name":"纳斯达克","score":5.39},{"name":"沪深300","score":6.82},{"name":"中期国债","score":4.76},{"name":"现货黄金","score":6.78},{"name":"红利低波","score":5.3},{"name":"长江电力","score":3.59}]},{"date":"2026-02-13","scores":[{"name":"纳斯达克","score":5.45},{"name":"沪深300","score":6.09},{"name":"中期国债","score":4.9},{"name":"恒生指数","score":5.82},{"name":"现货黄金","score":6.57},{"name":"红利低波","score":4.27},{"name":"长江电力","score":3.33}]},{"date":"2026-02-24","scores":[{"name":"纳斯达克","score":6.05},{"name":"沪深300","score":7.71},{"name":"中期国债","score":4.8},{"name":"恒生指数","score":6.51},{"name":"现货黄金","score":7.03},{"name":"红利低波","score":4.91},{"name":"长江电力","score":3.51}]},{"date":"2026-02-25","scores":[{"name":"纳斯达克","score":6.49},{"name":"沪深300","score":7.66},{"name":"中期国债","score":4.34},{"name":"恒生指数","score":6.56},{"name":"现货黄金","score":7.04},{"name":"红利低波","score":4.75},{"name":"长江电力","score":3.4}]},{"date":"2026-02-26","scores":[{"name":"纳斯达克","score":6.16},{"name":"沪深300","score":7.58},{"name":"中期国债","score":4.09},{"name":"恒生指数","score":6.02},{"name":"现货黄金","score":6.95},{"name":"红利低波","score":4.56},{"name":"长江电力","score":3.42}]},{"date":"2026-02-27","scores":[{"name":"纳斯达克","score":5.97},{"name":"沪深300","score":7.43},{"name":"中期国债","score":4.33},{"name":"恒生指数","score":6.28},{"name":"现货黄金","score":7.08},{"name":"红利低波","score":4.86},{"name":"长江电力","score":3.48}]},{"date":"2026-03-02","scores":[{"name":"纳斯达克","score":5.98},{"name":"沪深300","score":7.29},{"name":"中期国债","score":4.41},{"name":"恒生指数","score":5.51},{"name":"现货黄金","score":7.14},{"name":"红利低波","score":5.65},{"name":"长江电力","score":4.27}]},{"date":"2026-03-03","scores":[{"name":"纳斯达克","score":5.6},{"name":"沪深300","score":6.37},{"name":"中期国债","score":4.41},{"name":"恒生指数","score":4.61},{"name":"现货黄金","score":6.99},{"name":"红利低波","score":6.79},{"name":"长江电力","score":4.83}]},{"date":"2026-03-04","scores":[{"name":"纳斯达克","score":6.26},{"name":"沪深300","score":5.59},{"name":"中期国债","score":4.76},{"name":"恒生指数","score":4.12},{"name":"现货黄金","score":6.52},{"name":"WTI原油","score":5.69},{"name":"红利低波","score":5.23},{"name":"长江电力","score":4.95}]},{"date":"2026-03-05","scores":[{"name":"纳斯达克","score":6.09},{"name":"沪深300","score":6.13},{"name":"中期国债","score":4.58},{"name":"恒生指数","score":4.7},{"name":"现货黄金","score":6.5},{"name":"WTI原油","score":5.78},{"name":"红利低波","score":5.48},{"name":"长江电力","score":4.96}]},{"date":"2026-03-06","scores":[{"name":"纳斯达克","score":5.39},{"name":"沪深300","score":6.22},{"name":"中期国债","score":4.63},{"name":"恒生指数","score":5.13},{"name":"现货黄金","score":6.3},{"name":"WTI原油","score":5.94},{"name":"红利低波","score":5.97},{"name":"长江电力","score":5.05}]},{"date":"2026-03-09","scores":[{"name":"纳斯达克","score":5.96},{"name":"沪深300","score":5.64},{"name":"中期国债","score":3.96},{"name":"恒生指数","score":4.9},{"name":"现货黄金","score":5.77},{"name":"WTI原油","score":5.68},{"name":"豆粕加权","score":5.6},{"name":"红利低波","score":6.01},{"name":"长江电力","score":5.09}]},{"date":"2026-03-10","scores":[{"name":"纳斯达克","score":6.0},{"name":"沪深300","score":6.25},{"name":"中期国债","score":3.95},{"name":"恒生指数","score":5.51},{"name":"现货黄金","score":5.95},{"name":"WTI原油","score":5.28},{"name":"豆粕加权","score":5.46},{"name":"红利低波","score":5.58},{"name":"长江电力","score":5.03}]},{"date":"2026-03-11","scores":[{"name":"纳斯达克","score":6.2},{"name":"沪深300","score":6.78},{"name":"中期国债","score":3.82},{"name":"恒生指数","score":5.75},{"name":"现货黄金","score":6.21},{"name":"WTI原油","score":5.5},{"name":"豆粕加权","score":5.65},{"name":"红利低波","score":6.77},{"name":"长江电力","score":5.23}]},{"date":"2026-03-12","scores":[{"name":"纳斯达克","score":5.49},{"name":"沪深300","score":6.49},{"name":"中期国债","score":3.85},{"name":"恒生指数","score":5.38},{"name":"现货黄金","score":6.16},{"name":"WTI原油","score":5.49},{"name":"豆粕加权","score":5.66},{"name":"红利低波","score":7.19},{"name":"长江电力","score":5.43}]},{"date":"2026-03-13","scores":[{"name":"纳斯达克","score":5.28},{"name":"沪深300","score":6.32},{"name":"中期国债","score":3.88},{"name":"恒生指数","score":5.03},{"name":"现货黄金","score":5.64},{"name":"WTI原油","score":5.6},{"name":"豆粕加权","score":5.68},{"name":"红利低波","score":7.24},{"name":"长江电力","score":5.37}]},{"date":"2026-03-16","scores":[{"name":"纳斯达克","score":5.6},{"name":"沪深300","score":6.39},{"name":"中期国债","score":3.78},{"name":"恒生指数","score":5.39},{"name":"现货黄金","score":6.27},{"name":"WTI原油","score":6.18},{"name":"豆粕加权","score":6.37},{"name":"红利低波","score":7.21},{"name":"长江电力","score":5.29}]},{"date":"2026-03-17","scores":[{"name":"纳斯达克","score":5.83},{"name":"沪深300","score":5.99},{"name":"中期国债","score":3.85},{"name":"恒生指数","score":5.2},{"name":"现货黄金","score":6.17},{"name":"WTI原油","score":6.27},{"name":"豆粕加权","score":6.21},{"name":"红利低波","score":7.45},{"name":"长江电力","score":5.44}]},{"date":"2026-03-18","scores":[{"name":"纳斯达克","score":5.27},{"name":"沪深300","score":6.13},{"name":"中期国债","score":4.19},{"name":"恒生指数","score":5.46},{"name":"现货黄金","score":6.11},{"name":"WTI原油","score":6.41},{"name":"豆粕加权","score":6.19},{"name":"红利低波","score":7.07},{"name":"长江电力","score":5.18}]},{"date":"2026-03-19","scores":[{"name":"纳斯达克","score":5.07},{"name":"沪深300","score":5.25},{"name":"中期国债","score":4.45},{"name":"恒生指数","score":4.34},{"name":"现货黄金","score":5.26},{"name":"WTI原油","score":6.35},{"name":"豆粕加权","score":6.15},{"name":"红利低波","score":6.7},{"name":"长江电力","score":5.12}]},{"date":"2026-03-20","scores":[{"name":"纳斯达克","score":4.9},{"name":"沪深300","score":5.04},{"name":"中期国债","score":4.39},{"name":"恒生指数","score":4.0},{"name":"现货黄金","score":5.01},{"name":"WTI原油","score":6.41},{"name":"豆粕加权","score":6.24},{"name":"红利低波","score":6.4},{"name":"长江电力","score":5.0}]},{"date":"2026-03-23","scores":[{"name":"纳斯达克","score":5.84},{"name":"沪深300","score":3.65},{"name":"中期国债","score":4.77},{"name":"恒生指数","score":3.05},{"name":"现货黄金","score":4.62},{"name":"WTI原油","score":6.03},{"name":"豆粕加权","score":5.97},{"name":"红利低波","score":3.13},{"name":"长江电力","score":4.26}]},{"date":"2026-03-29","scores":[{"name":"纳斯达克","score":3.99},{"name":"沪深300","score":4.41},{"name":"中期国债","score":4.96},{"name":"恒生指数","score":3.9},{"name":"现货黄金","score":5.83},{"name":"WTI原油","score":6.44},{"name":"豆粕加权","score":5.89},{"name":"红利低波","score":5.21},{"name":"长江电力","score":5.01}]},{"date":"2026-03-30","scores":[{"name":"纳斯达克","score":3.64},{"name":"沪深300","score":4.45},{"name":"中期国债","score":4.75},{"name":"恒生指数","score":3.69},{"name":"现货黄金","score":5.95},{"name":"WTI原油","score":6.5},{"name":"豆粕加权","score":5.65},{"name":"红利低波","score":6.19},{"name":"长江电力","score":4.91}]},{"date":"2026-03-31","scores":[{"name":"纳斯达克","score":5.3},{"name":"沪深300","score":4.26},{"name":"中期国债","score":4.77},{"name":"恒生指数","score":3.57},{"name":"现货黄金","score":6.07},{"name":"WTI原油","score":6.53},{"name":"豆粕加权","score":5.62},{"name":"红利低波","score":6.49},{"name":"长江电力","score":4.76}]},{"date":"2026-04-01","scores":[{"name":"纳斯达克","score":5.81},{"name":"沪深300","score":5.02},{"name":"中期国债","score":4.29},{"name":"恒生指数","score":4.39},{"name":"现货黄金","score":6.44},{"name":"WTI原油","score":6.28},{"name":"豆粕加权","score":5.34},{"name":"红利低波","score":6.59},{"name":"长江电力","score":4.57}]},{"date":"2026-04-02","scores":[{"name":"纳斯达克","score":5.69},{"name":"沪深300","score":4.48},{"name":"中期国债","score":4.43},{"name":"恒生指数","score":3.96},{"name":"现货黄金","score":6.07},{"name":"WTI原油","score":6.51},{"name":"豆粕加权","score":5.34},{"name":"红利低波","score":7.02},{"name":"长江电力","score":4.76}]},{"date":"2026-04-03","scores":[{"name":"纳斯达克","score":6.36},{"name":"沪深300","score":4.11},{"name":"中期国债","score":4.73},{"name":"恒生指数","score":3.77},{"name":"现货黄金","score":6.01},{"name":"WTI原油","score":6.51},{"name":"豆粕加权","score":5.26},{"name":"红利低波","score":5.59},{"name":"长江电力","score":4.31}]},{"date":"2026-04-07","scores":[{"name":"纳斯达克","score":5.62},{"name":"沪深300","score":4.05},{"name":"中期国债","score":4.89},{"name":"恒生指数","score":3.74},{"name":"现货黄金","score":5.5},{"name":"WTI原油","score":6.65},{"name":"豆粕加权","score":4.96},{"name":"红利低波","score":5.08},{"name":"长江电力","score":3.98}]},{"date":"2026-04-08","scores":[{"name":"纳斯达克","score":7.24},{"name":"沪深300","score":5.51},{"name":"中期国债","score":4.55},{"name":"恒生指数","score":5.41},{"name":"现货黄金","score":5.79},{"name":"WTI原油","score":6.18},{"name":"豆粕加权","score":4.99},{"name":"红利低波","score":6.16},{"name":"长江电力","score":4.2}]},{"date":"2026-04-09","scores":[{"name":"纳斯达克","score":6.96},{"name":"沪深300","score":5.63},{"name":"中期国债","score":4.61},{"name":"恒生指数","score":5.35},{"name":"现货黄金","score":5.64},{"name":"WTI原油","score":5.94},{"name":"豆粕加权","score":5.22},{"name":"红利低波","score":5.32},{"name":"长江电力","score":3.91}]},{"date":"2026-04-10","scores":[{"name":"纳斯达克","score":7.39},{"name":"沪深300","score":5.73},{"name":"中期国债","score":4.56},{"name":"恒生指数","score":5.48},{"name":"现货黄金","score":5.74},{"name":"WTI原油","score":5.75},{"name":"豆粕加权","score":5.24},{"name":"红利低波","score":5.23},{"name":"长江电力","score":3.92}]},{"date":"2026-04-13","scores":[{"name":"纳斯达克","score":6.94},{"name":"沪深300","score":6.03},{"name":"中期国债","score":4.86},{"name":"恒生指数","score":5.59},{"name":"现货黄金","score":5.86},{"name":"WTI原油","score":6.07},{"name":"豆粕加权","score":5.62},{"name":"红利低波","score":5.65},{"name":"长江电力","score":3.99}]},{"date":"2026-04-14","scores":[{"name":"纳斯达克","score":6.69},{"name":"沪深300","score":6.51},{"name":"中期国债","score":4.86},{"name":"恒生指数","score":6.06},{"name":"现货黄金","score":6.16},{"name":"WTI原油","score":5.8},{"name":"豆粕加权","score":5.14},{"name":"红利低波","score":5.25}]},{"date":"2026-04-15","scores":[{"name":"纳斯达克","score":6.42},{"name":"沪深300","score":6.63},{"name":"中期国债","score":5.03},{"name":"恒生指数","score":6.1},{"name":"现货黄金","score":6.14},{"name":"WTI原油","score":5.8},{"name":"豆粕加权","score":5.21},{"name":"红利低波","score":5.79},{"name":"长江电力","score":4.21}]},{"date":"2026-04-16","scores":[{"name":"纳斯达克","score":7.48},{"name":"沪深300","score":7.0},{"name":"中期国债","score":4.94},{"name":"恒生指数","score":6.72},{"name":"现货黄金","score":6.23},{"name":"WTI原油","score":5.7},{"name":"豆粕加权","score":5.27},{"name":"红利低波","score":5.7},{"name":"长江电力","score":4.2}]},{"date":"2026-04-17","scores":[{"name":"纳斯达克","score":6.94},{"name":"沪深300","score":6.74},{"name":"中期国债","score":5.22},{"name":"恒生指数","score":6.43},{"name":"现货黄金","score":6.36},{"name":"WTI原油","score":5.3},{"name":"豆粕加权","score":4.98},{"name":"红利低波","score":5.41},{"name":"长江电力","score":3.93}]},{"date":"2026-04-20","scores":[{"name":"纳斯达克","score":6.76},{"name":"沪深300","score":7.14},{"name":"中期国债","score":4.85},{"name":"恒生指数","score":6.78},{"name":"现货黄金","score":5.73},{"name":"WTI原油","score":4.79},{"name":"豆粕加权","score":5.16},{"name":"红利低波","score":6.33},{"name":"长江电力","score":5.11}]},{"date":"2026-04-21","scores":[{"name":"纳斯达克","score":6.67},{"name":"沪深300","score":7.24},{"name":"中期国债","score":4.91},{"name":"恒生指数","score":6.85},{"name":"现货黄金","score":5.54},{"name":"WTI原油","score":5.1},{"name":"豆粕加权","score":5.38},{"name":"红利低波","score":6.92},{"name":"长江电力","score":5.33}]},{"date":"2026-04-22","scores":[{"name":"纳斯达克","score":7.27},{"name":"沪深300","score":7.34},{"name":"中期国债","score":5.03},{"name":"恒生指数","score":6.65},{"name":"现货黄金","score":5.37},{"name":"WTI原油","score":5.41},{"name":"豆粕加权","score":5.64},{"name":"红利低波","score":6.49},{"name":"长江电力","score":4.72}]},{"date":"2026-04-24","scores":[{"name":"纳斯达克","score":7.6},{"name":"沪深300","score":7.14},{"name":"中期国债","score":4.94},{"name":"恒生指数","score":6.29},{"name":"现货黄金","score":5.54},{"name":"WTI原油","score":5.49},{"name":"豆粕加权","score":5.09},{"name":"红利低波","score":7.03},{"name":"长江电力","score":4.69}]},{"date":"2026-04-24","scores":[{"name":"纳斯达克","score":7.07},{"name":"沪深300","score":7.27},{"name":"中期国债","score":4.97},{"name":"恒生指数","score":6.35},{"name":"现货黄金","score":5.29},{"name":"WTI原油","score":5.33},{"name":"豆粕加权","score":5.56},{"name":"红利低波","score":7.19},{"name":"长江电力","score":4.89}]},{"date":"2026-04-27","scores":[{"name":"纳斯达克","score":7.72},{"name":"沪深300","score":6.64},{"name":"中期国债","score":4.29},{"name":"恒生指数","score":5.93},{"name":"现货黄金","score":5.33},{"name":"WTI原油","score":5.52},{"name":"豆粕加权","score":5.57}]},{"date":"2026-04-28","scores":[{"name":"纳斯达克","score":7.35},{"name":"沪深300","score":6.93},{"name":"中期国债","score":4.6},{"name":"恒生指数","score":5.91},{"name":"现货黄金","score":5.15},{"name":"WTI原油","score":5.81},{"name":"豆粕加权","score":5.55}]},{"date":"2026-04-29","scores":[{"name":"纳斯达克","score":8.03},{"name":"沪深300","score":7.37},{"name":"中期国债","score":4.91},{"name":"恒生指数","score":6.47},{"name":"现货黄金","score":5.06},{"name":"WTI原油","score":6.35},{"name":"豆粕加权","score":5.66}]},{"date":"2026-05-05","scores":[{"name":"纳斯达克","score":7.89},{"name":"沪深300","score":7.24},{"name":"中期国债","score":4.7},{"name":"恒生指数","score":6.22},{"name":"现货黄金","score":5.31},{"name":"WTI原油","score":6.27},{"name":"豆粕加权","score":5.78},{"name":"红利低波","score":5.47},{"name":"长江电力","score":4.99}]},{"date":"2026-05-06","scores":[{"name":"纳斯达克","score":7.96},{"name":"沪深300","score":7.31},{"name":"中期国债","score":4.29},{"name":"恒生指数","score":6.5},{"name":"现货黄金","score":5.77},{"name":"WTI原油","score":4.75},{"name":"豆粕加权","score":5.02},{"name":"红利低波","score":4.27},{"name":"长江电力","score":4.47}]},{"date":"2026-05-07","scores":[{"name":"纳斯达克","score":8.24},{"name":"沪深300","score":7.41},{"name":"中期国债","score":4.36},{"name":"恒生指数","score":7.13},{"name":"现货黄金","score":6.05},{"name":"WTI原油","score":4.75},{"name":"豆粕加权","score":5.02},{"name":"红利低波","score":4.27},{"name":"长江电力","score":4.47}]},{"date":"2026-05-08","scores":[{"name":"纳斯达克","score":8.22},{"name":"沪深300","score":7.01},{"name":"中期国债","score":4.62},{"name":"恒生指数","score":6.7},{"name":"现货黄金","score":5.77}]},{"date":"2026-05-11","scores":[{"name":"纳斯达克","score":8.01},{"name":"沪深300","score":7.7},{"name":"中期国债","score":4.55},{"name":"恒生指数","score":6.94},{"name":"现货黄金","score":5.59},{"name":"WTI原油","score":5.56}]},{"date":"2026-05-12","scores":[{"name":"纳斯达克","score":7.9},{"name":"沪深300","score":7.32},{"name":"中期国债","score":4.61},{"name":"恒生指数","score":6.61},{"name":"现货黄金","score":5.43},{"name":"WTI原油","score":6.39},{"name":"豆粕加权","score":5.84},{"name":"红利低波","score":4.21},{"name":"长江电力","score":4.45}]},{"date":"2026-05-13","scores":[{"name":"纳斯达克","score":7.91},{"name":"沪深300","score":7.57},{"name":"中期国债","score":4.59},{"name":"恒生指数","score":6.77},{"name":"现货黄金","score":5.03}]},{"date":"2026-05-14","scores":[{"name":"纳斯达克","score":8.05},{"name":"沪深300","score":6.94}]},{"date":"2026-05-15","scores":[{"name":"纳斯达克","score":8.01},{"name":"沪深300","score":6.55},{"name":"中期国债","score":4.79},{"name":"恒生指数","score":5.81},{"name":"现货黄金","score":5.46},{"name":"WTI原油","score":7.85},{"name":"豆粕加权","score":4.69},{"name":"红利低波","score":3.23}]},{"date":"2026-05-18","scores":[{"name":"纳斯达克","score":7.9},{"name":"沪深300","score":6.61},{"name":"中期国债","score":4.89},{"name":"恒生指数","score":5.56},{"name":"现货黄金","score":5.61},{"name":"WTI原油","score":7.8},{"name":"豆粕加权","score":5.03},{"name":"红利低波","score":2.67},{"name":"长江电力","score":4.08}]},{"date":"2026-05-19","scores":[{"name":"纳斯达克","score":7.97},{"name":"沪深300","score":7.11},{"name":"中期国债","score":4.86},{"name":"恒生指数","score":5.91},{"name":"现货黄金","score":5.6},{"name":"WTI原油","score":7.62},{"name":"豆粕加权","score":5.76},{"name":"红利低波","score":3.43},{"name":"长江电力","score":4.68}]},{"date":"2026-05-20","scores":[{"name":"纳斯达克","score":8.0},{"name":"沪深300","score":7.04},{"name":"中期国债","score":5.1},{"name":"恒生指数","score":5.74},{"name":"现货黄金","score":5.52},{"name":"WTI原油","score":6.63},{"name":"豆粕加权","score":5.38},{"name":"红利低波","score":3.02}]},{"date":"2026-05-21","scores":[{"name":"纳斯达克","score":7.89},{"name":"沪深300","score":6.45},{"name":"中期国债","score":5.1},{"name":"恒生指数","score":5.15},{"name":"现货黄金","score":5.51},{"name":"WTI原油","score":6.49},{"name":"豆粕加权","score":5.12},{"name":"红利低波","score":2.18},{"name":"长江电力","score":3.75}]},{"date":"2026-05-22","scores":[{"name":"纳斯达克","score":7.89},{"name":"沪深300","score":6.82},{"name":"中期国债","score":5.02},{"name":"恒生指数","score":5.54},{"name":"现货黄金","score":5.68},{"name":"WTI原油","score":6.42},{"name":"豆粕加权","score":5.15},{"name":"红利低波","score":2.11},{"name":"长江电力","score":3.63}]},{"date":"2026-05-25","scores":[{"name":"纳斯达克","score":7.85},{"name":"沪深300","score":7.14},{"name":"中期国债","score":4.82},{"name":"恒生指数","score":5.44},{"name":"现货黄金","score":5.85},{"name":"WTI原油","score":5.83},{"name":"豆粕加权","score":4.79},{"name":"红利低波","score":2.09},{"name":"长江电力","score":3.8}]},{"date":"2026-05-26","scores":[{"name":"纳斯达克","score":7.83},{"name":"沪深300","score":7.24},{"name":"中期国债","score":5.11},{"name":"恒生指数","score":5.75},{"name":"现货黄金","score":5.67},{"name":"WTI原油","score":6.14},{"name":"豆粕加权","score":4.84},{"name":"红利低波","score":2.29},{"name":"长江电力","score":4.32}]},{"date":"2026-05-27","scores":[{"name":"纳斯达克","score":7.88},{"name":"沪深300","score":7.06},{"name":"中期国债","score":5.38},{"name":"恒生指数","score":5.43},{"name":"现货黄金","score":5.49},{"name":"WTI原油","score":5.44},{"name":"豆粕加权","score":4.85},{"name":"红利低波","score":1.82},{"name":"长江电力","score":4.34}]},{"date":"2026-05-28","scores":[{"name":"纳斯达克","score":7.99},{"name":"沪深300","score":6.96},{"name":"中期国债","score":5.41},{"name":"恒生指数","score":5.08},{"name":"现货黄金","score":5.37},{"name":"WTI原油","score":5.42},{"name":"豆粕加权","score":5.2},{"name":"红利低波","score":1.46},{"name":"长江电力","score":4.25}]},{"date":"2026-05-29","scores":[{"name":"纳斯达克","score":8.02},{"name":"沪深300","score":7.07},{"name":"中期国债","score":5.44},{"name":"恒生指数","score":5.27},{"name":"现货黄金","score":5.47},{"name":"WTI原油","score":5.45}]},{"date":"2026-06-01","scores":[{"name":"纳斯达克","score":8.14},{"name":"沪深300","score":6.52},{"name":"中期国债","score":5.53},{"name":"恒生指数","score":5.18},{"name":"现货黄金","score":5.25},{"name":"WTI原油","score":5.58},{"name":"豆粕加权","score":5.06},{"name":"红利低波","score":5.15}]},{"date":"2026-06-02","scores":[{"name":"纳斯达克","score":8.18},{"name":"沪深300","score":7.16},{"name":"中期国债","score":5.34},{"name":"恒生指数","score":6.14},{"name":"现货黄金","score":5.25},{"name":"WTI原油","score":6.05},{"name":"豆粕加权","score":4.7},{"name":"红利低波","score":4.96},{"name":"长江电力","score":5.21}]},{"date":"2026-06-03","scores":[{"name":"纳斯达克","score":7.89},{"name":"沪深300","score":7.21},{"name":"中期国债","score":5.24},{"name":"恒生指数","score":5.78},{"name":"现货黄金","score":5.2},{"name":"WTI原油","score":6.36},{"name":"豆粕加权","score":4.74},{"name":"红利低波","score":3.94},{"name":"长江电力","score":5.06}]},{"date":"2026-06-04","scores":[{"name":"纳斯达克","score":7.63},{"name":"沪深300","score":6.88},{"name":"中期国债","score":5.47},{"name":"恒生指数","score":5.24},{"name":"现货黄金","score":5.24},{"name":"WTI原油","score":6.07},{"name":"豆粕加权","score":4.42},{"name":"红利低波","score":2.53},{"name":"长江电力","score":4.72}]},{"date":"2026-06-05","scores":[{"name":"纳斯达克","score":6.67},{"name":"沪深300","score":5.97},{"name":"中期国债","score":5.52},{"name":"恒生指数","score":5.02},{"name":"现货黄金","score":4.86},{"name":"WTI原油","score":5.93},{"name":"豆粕加权","score":4.09}]},{"date":"2026-06-23","scores":[{"name":"沪深300","score":6.77},{"name":"中期国债","score":4.81},{"name":"恒生指数","score":4.3},{"name":"红利低波","score":0.99},{"name":"长江电力","score":3.56}]},{"date":"2026-06-26","scores":[{"name":"纳斯达克","score":6.16},{"name":"沪深300","score":6.09},{"name":"中期国债","score":5.51},{"name":"恒生指数","score":3.88},{"name":"现货黄金","score":4.66},{"name":"WTI原油","score":4.12},{"name":"豆粕加权","score":5.39},{"name":"红利低波","score":0.13},{"name":"长江电力","score":3.46}]},{"date":"2026-06-29","scores":[{"name":"纳斯达克","score":6.67},{"name":"沪深300","score":6.5},{"name":"中期国债","score":5.49},{"name":"恒生指数","score":4.54},{"name":"现货黄金","score":4.25},{"name":"WTI原油","score":4.1},{"name":"豆粕加权","score":5.25},{"name":"红利低波","score":0.24}]},{"date":"2026-06-30","scores":[{"name":"纳斯达克","score":7.14},{"name":"沪深300","score":6.57},{"name":"中期国债","score":5.23},{"name":"恒生指数","score":4.34},{"name":"现货黄金","score":4.13},{"name":"WTI原油","score":4.07},{"name":"豆粕加权","score":5.04},{"name":"红利低波","score":0.198},{"name":"长江电力","score":3.32}]},{"date":"2026-07-01","scores":[{"name":"纳斯达克","score":7.11},{"name":"沪深300","score":6.04},{"name":"中期国债","score":4.8},{"name":"恒生指数","score":4.06},{"name":"现货黄金","score":4.58},{"name":"WTI原油","score":3.89},{"name":"豆粕加权","score":5.33},{"name":"红利低波","score":1.199},{"name":"长江电力","score":3.51}]},{"date":"2026-07-02","scores":[{"name":"纳斯达克","score":6.86},{"name":"沪深300","score":5.32},{"name":"中期国债","score":5.25},{"name":"恒生指数","score":3.78},{"name":"现货黄金","score":4.82},{"name":"WTI原油","score":3.88},{"name":"豆粕加权","score":5.42},{"name":"红利低波","score":1.536},{"name":"长江电力","score":3.87}]},{"date":"2026-07-03","scores":[{"name":"纳斯达克","score":6.86},{"name":"沪深300","score":5.32},{"name":"中期国债","score":5.14},{"name":"恒生指数","score":4.06},{"name":"现货黄金","score":4.99},{"name":"WTI原油","score":4.1},{"name":"豆粕加权","score":5.33},{"name":"红利低波","score":1.918},{"name":"长江电力","score":3.96}]},{"date":"2026-07-06","scores":[{"name":"纳斯达克","score":7.11},{"name":"沪深300","score":5.35},{"name":"中期国债","score":5.29},{"name":"恒生指数","score":4.29},{"name":"现货黄金","score":4.88},{"name":"WTI原油","score":4.24},{"name":"豆粕加权","score":5.94},{"name":"红利低波","score":2.689},{"name":"长江电力","score":4.19}]},{"date":"2026-07-07","scores":[{"name":"纳斯达克","score":7.41},{"name":"红利低波","score":2.3345},{"name":"沪深300","score":4.97},{"name":"中期国债","score":5.79},{"name":"恒生指数","score":4.86},{"name":"现货黄金","score":4.91},{"name":"WTI原油","score":4.5},{"name":"豆粕加权","score":6.09},{"name":"长江电力","score":4.39}]},{"date":"2026-07-08","scores":[{"name":"纳斯达克","score":7.52},{"name":"红利低波","score":2.965},{"name":"沪深300","score":5.44},{"name":"中期国债","score":5.98},{"name":"恒生指数","score":4.77},{"name":"现货黄金","score":4.37},{"name":"WTI原油","score":5.22},{"name":"豆粕加权","score":6.31},{"name":"长江电力","score":4.74}]},{"date":"2026-07-09","scores":[{"name":"纳斯达克","score":7.54},{"name":"红利低波","score":2.653},{"name":"沪深300","score":5.65},{"name":"中期国债","score":5.75},{"name":"恒生指数","score":4.76},{"name":"现货黄金","score":4.48},{"name":"WTI原油","score":4.88},{"name":"豆粕加权","score":6.26},{"name":"长江电力","score":4.66}]},{"date":"2026-07-10","scores":[{"name":"纳斯达克","score":7.27},{"name":"红利低波","score":2.527},{"name":"沪深300","score":4.91},{"name":"中期国债","score":5.9},{"name":"恒生指数","score":4.49},{"name":"现货黄金","score":4.42},{"name":"WTI原油","score":3.95},{"name":"豆粕加权","score":6.48},{"name":"长江电力","score":4.82}]},{"date":"2026-07-13","scores":[{"name":"纳斯达克","score":7.09},{"name":"红利低波","score":3.029},{"name":"沪深300","score":4.97},{"name":"中期国债","score":5.94},{"name":"恒生指数","score":4.55},{"name":"现货黄金","score":4.15},{"name":"WTI原油","score":4.16},{"name":"豆粕加权","score":6.48},{"name":"长江电力","score":5.365},{"name":"中证2000","score":4.19}]},{"date":"2026-07-14","scores":[{"name":"纳斯达克","score":7.3},{"name":"红利低波","score":3.509},{"name":"沪深300","score":4.91},{"name":"中期国债","score":5.83},{"name":"恒生指数","score":4.56},{"name":"现货黄金","score":4.06},{"name":"WTI原油","score":4.31},{"name":"豆粕加权","score":6.48},{"name":"长江电力","score":6.05},{"name":"中证2000","score":4.42}]},{"date":"2026-07-15","scores":[{"name":"纳斯达克","score":7.33},{"name":"红利低波","score":3.685},{"name":"沪深300","score":4.71},{"name":"中期国债","score":5.91},{"name":"恒生指数","score":4.75},{"name":"现货黄金","score":4.12},{"name":"WTI原油","score":4.37},{"name":"豆粕加权","score":6.68},{"name":"长江电力","score":6.17},{"name":"中证2000","score":4.31}]},{"date":"2026-07-16","scores":[{"name":"纳斯达克","score":7.04},{"name":"红利低波","score":3.613},{"name":"沪深300","score":5.0},{"name":"中期国债","score":6.01},{"name":"恒生指数","score":5.05},{"name":"现货黄金","score":4.05},{"name":"WTI原油","score":4.41},{"name":"豆粕加权","score":6.58},{"name":"长江电力","score":5.6},{"name":"中证2000","score":4.06}]},{"date":"2026-07-17","scores":[{"name":"纳斯达克","score":6.54},{"name":"红利低波","score":4.11},{"name":"沪深300","score":3.97},{"name":"中期国债","score":6.33},{"name":"恒生指数","score":4.3},{"name":"现货黄金","score":4.13},{"name":"WTI原油","score":4.49},{"name":"豆粕加权","score":6.58},{"name":"长江电力","score":5.96},{"name":"中证2000","score":3.49}]},{"date":"2026-07-20","scores":[{"name":"纳斯达克","score":6.59},{"name":"红利低波","score":5.31},{"name":"沪深300","score":4.65},{"name":"中期国债","score":6.09},{"name":"恒生指数","score":5.17},{"name":"现货黄金","score":4.07},{"name":"WTI原油","score":4.46},{"name":"豆粕加权","score":6.94},{"name":"长江电力","score":6.57},{"name":"中证2000","score":3.52}]},{"date":"2026-07-21","scores":[{"name":"纳斯达克","score":6.99},{"name":"红利低波","score":4.81},{"name":"沪深300","score":4.98},{"name":"中期国债","score":5.96},{"name":"恒生指数","score":5.18},{"name":"现货黄金","score":4.28},{"name":"WTI原油","score":4.6},{"name":"豆粕加权","score":7.05},{"name":"长江电力","score":6.25},{"name":"中证2000","score":3.94}]},{"date":"2026-07-22","scores":[{"name":"纳斯达克","score":6.96},{"name":"红利低波","score":5.1},{"name":"沪深300","score":4.54},{"name":"中期国债","score":6.09},{"name":"恒生指数","score":4.94},{"name":"现货黄金","score":4.67},{"name":"WTI原油","score":4.67},{"name":"豆粕加权","score":7.22}]},{"date":"2026-07-23","scores":[{"name":"纳斯达克","score":6.47},{"name":"红利低波","score":5.35},{"name":"沪深300","score":4.69},{"name":"中期国债","score":5.87},{"name":"恒生指数","score":5.24},{"name":"现货黄金","score":4.35},{"name":"WTI原油","score":4.77},{"name":"豆粕加权","score":7.15},{"name":"长江电力","score":6.34},{"name":"中证2000","score":3.98}]},{"date":"2026-07-24","scores":[{"name":"纳斯达克","score":5.69},{"name":"红利低波","score":4.94},{"name":"沪深300","score":4.48},{"name":"中期国债","score":6.08},{"name":"恒生指数","score":4.96},{"name":"现货黄金","score":4.3},{"name":"WTI原油","score":4.74},{"name":"豆粕加权","score":7.01},{"name":"长江电力","score":6.28},{"name":"中证2000","score":3.68}]},{"date":"2026-07-27","scores":[{"name":"纳斯达克","score":5.62},{"name":"红利低波","score":4.91},{"name":"沪深300","score":4.84},{"name":"中期国债","score":5.81},{"name":"恒生指数","score":5.3},{"name":"现货黄金","score":4.29},{"name":"WTI原油","score":4.38},{"name":"豆粕加权","score":6.06},{"name":"长江电力","score":5.64},{"name":"中证2000","score":4.19}]},{"date":"2026-07-28","scores":[{"name":"纳斯达克","score":5.55},{"name":"红利低波","score":4.87},{"name":"沪深300","score":4.32},{"name":"中期国债","score":5.88},{"name":"恒生指数","score":5.06},{"name":"现货黄金","score":4.15},{"name":"WTI原油","score":4.4},{"name":"豆粕加权","score":5.87},{"name":"长江电力","score":6.14},{"name":"中证2000","score":4.07}]},{"date":"2026-07-29","scores":[{"name":"纳斯达克","score":5.37},{"name":"红利低波","score":5.49},{"name":"沪深300","score":4.26},{"name":"中期国债","score":5.86},{"name":"恒生指数","score":5.44},{"name":"现货黄金","score":4.33},{"name":"WTI原油","score":4.46},{"name":"豆粕加权","score":5.48},{"name":"长江电力","score":6.16},{"name":"中证2000","score":3.91}]},{"date":"2026-07-30","scores":[{"name":"纳斯达克","score":5.88},{"name":"红利低波","score":5.95},{"name":"沪深300","score":4.12},{"name":"中期国债","score":6.02},{"name":"恒生指数","score":5.4},{"name":"现货黄金","score":4.41},{"name":"WTI原油","score":4.44},{"name":"豆粕加权","score":5.55},{"name":"长江电力","score":6.57},{"name":"中证2000","score":3.51}]},{"date":"2026-07-31","scores":[{"name":"纳斯达克","score":6.19},{"name":"红利低波","score":5.79},{"name":"沪深300","score":4.22},{"name":"中期国债","score":6.35},{"name":"恒生指数","score":5.47},{"name":"现货黄金","score":4.28},{"name":"WTI原油","score":4.8},{"name":"豆粕加权","score":5.45},{"name":"长江电力","score":6.31},{"name":"中证2000","score":3.87}]},{"date":"2026-08-03","scores":[{"name":"纳斯达克","score":6.65},{"name":"红利低波","score":5.84},{"name":"沪深300","score":4.16},{"name":"中期国债","score":6.24},{"name":"恒生指数","score":5.51},{"name":"现货黄金","score":4.22},{"name":"WTI原油","score":4.5},{"name":"豆粕加权","score":5.5},{"name":"长江电力","score":6.25},{"name":"中证2000","score":4.02}]},{"date":"2026-08-04","scores":[{"name":"纳斯达克","score":7.22},{"name":"红利低波","score":5.05},{"name":"沪深300","score":4.25},{"name":"中期国债","score":6.38},{"name":"恒生指数","score":5.43},{"name":"现货黄金","score":4.35},{"name":"WTI原油","score":4.26},{"name":"豆粕加权","score":5.21},{"name":"长江电力","score":5.4},{"name":"中证2000","score":4.41}]},{"date":"2026-08-05","scores":[{"name":"纳斯达克","score":7.18},{"name":"红利低波","score":4.71},{"name":"沪深300","score":4.3},{"name":"中期国债","score":6.33},{"name":"恒生指数","score":5.1},{"name":"现货黄金","score":4.89},{"name":"WTI原油","score":4.28},{"name":"豆粕加权","score":5.33},{"name":"长江电力","score":4.91},{"name":"中证2000","score":4.88}]},{"date":"2026-08-06","scores":[{"name":"纳斯达克","score":7.24},{"name":"红利低波","score":4.9},{"name":"沪深300","score":4.65},{"name":"中期国债","score":6.31},{"name":"恒生指数","score":5.35},{"name":"现货黄金","score":5.1},{"name":"WTI原油","score":4.38},{"name":"豆粕加权","score":5.52},{"name":"长江电力","score":4.97},{"name":"中证2000","score":5.1}]},{"date":"2026-08-07","scores":[{"name":"纳斯达克","score":7.35},{"name":"红利低波","score":4.81},{"name":"沪深300","score":5.25},{"name":"中期国债","score":6.36},{"name":"恒生指数","score":5.77},{"name":"现货黄金","score":5.69},{"name":"WTI原油","score":4.35},{"name":"豆粕加权","score":5.58},{"name":"长江电力","score":4.96},{"name":"中证2000","score":5.33}]},{"date":"2026-08-10","scores":[{"name":"纳斯达克","score":7.32},{"name":"红利低波","score":5.0},{"name":"沪深300","score":5.32},{"name":"中期国债","score":6.33},{"name":"恒生指数","score":5.82},{"name":"现货黄金","score":5.85},{"name":"WTI原油","score":4.51},{"name":"豆粕加权","score":5.69},{"name":"长江电力","score":5.24},{"name":"中证2000","score":5.46}]},{"date":"2026-08-11","scores":[{"name":"纳斯达克","score":7.23},{"name":"红利低波","score":4.93},{"name":"沪深300","score":5.26},{"name":"中期国债","score":6.27},{"name":"恒生指数","score":5.77},{"name":"现货黄金","score":5.94},{"name":"WTI原油","score":4.6},{"name":"豆粕加权","score":5.58},{"name":"长江电力","score":5.56},{"name":"中证2000","score":5.45}]},{"date":"2026-08-12","scores":[{"name":"纳斯达克","score":7.35},{"name":"红利低波","score":4.81},{"name":"沪深300","score":5.35},{"name":"中期国债","score":6.36},{"name":"恒生指数","score":5.69},{"name":"现货黄金","score":6.07},{"name":"WTI原油","score":4.61},{"name":"豆粕加权","score":5.67}]}];
+
+let assets  = {};
+let chart   = null;
 let curRange = '3m';
 
-// ── Boot ─────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem(LS_KEY);
-  if (saved) {
-    try { init(JSON.parse(saved)); } catch { localStorage.removeItem(LS_KEY); }
-  }
-});
-
-// ── File loading ─────────────────────────────────────
-function handleFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const json = JSON.parse(e.target.result);
-      if (!json.posts) throw new Error('缺少 posts 字段');
-      localStorage.setItem(LS_KEY, JSON.stringify(json));
-      init(json);
-      showToast(`✅ 加载成功，共 ${json.posts.length} 条帖子`);
-    } catch (err) {
-      showToast('❌ 文件格式错误：' + err.message);
-    }
-  };
-  reader.readAsText(file);
-  input.value = '';
-}
-
-// ── Init ─────────────────────────────────────────────
-function init(json) {
-  rawData = json;
-  assets  = buildTimeSeries(json.posts || []);
-
-  // Latest date
-  const allDates = Object.values(assets).flat().map(d => d.date).filter(Boolean).sort();
-  document.getElementById('latestDate').textContent = allDates[allDates.length - 1] || '—';
-
-  document.getElementById('emptyState').style.display  = 'none';
-  document.getElementById('dashboard').style.display   = '';
-
-  renderScoreCards();
-  renderChart(curRange);
-}
-
-// ── Build time series ─────────────────────────────────
 function buildTimeSeries(posts) {
   const map = {};
   posts.forEach(post => {
-    if (!post.scores || !post.scores.length || !post.date) return;
+    if (!post.scores || !post.date) return;
     post.scores.forEach(s => {
-      const name = s.name;
-      const score = parseFloat(s.score);
+      const name = s.name, score = parseFloat(s.score);
       if (isNaN(score)) return;
       if (!map[name]) map[name] = [];
-      // avoid duplicate dates — keep latest entry
       const existing = map[name].find(x => x.date === post.date);
-      if (existing) { existing.score = score; }
-      else { map[name].push({ date: post.date, score }); }
+      if (existing) existing.score = score;
+      else map[name].push({ date: post.date, score });
     });
   });
-  // sort each asset by date
   Object.values(map).forEach(arr => arr.sort((a, b) => a.date.localeCompare(b.date)));
   return map;
 }
 
-// ── Score info ────────────────────────────────────────
 function scoreInfo(s) {
   const i = BANDS.findIndex(b => s <= b.max);
   return { band: BANDS[i], cls: VALUE_CLS[i] };
 }
 
-// ── Current score cards ───────────────────────────────
 function renderScoreCards() {
   const row = document.getElementById('scoresRow');
   const names = Object.keys(assets).filter(n => SHOW_ASSETS.includes(n));
-
   row.innerHTML = names.map(name => {
     const series = assets[name];
     const latest = series[series.length - 1];
     if (!latest) return '';
     const { band, cls } = scoreInfo(latest.score);
-    return `
-      <div class="score-card">
-        <div class="score-asset">${esc(name)}</div>
-        <div class="score-value ${cls}">${latest.score.toFixed(2)}</div>
-        <span class="score-chip ${band.cls}">${band.label}</span>
-      </div>`;
+    return `<div class="score-card">
+      <div class="score-asset">${esc(name)}</div>
+      <div class="score-value ${cls}">${latest.score.toFixed(2)}</div>
+      <span class="score-chip ${band.cls}">${band.label}</span>
+    </div>`;
   }).join('');
 }
 
-// ── Time range filter ─────────────────────────────────
 function setRange(range, btn) {
   curRange = range;
   document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
@@ -373,21 +222,14 @@ function cutoffDate(range) {
   return '0000-00-00';
 }
 
-// ── Chart ─────────────────────────────────────────────
 function renderChart(range) {
   const cut = cutoffDate(range);
   const names = Object.keys(assets).filter(n => SHOW_ASSETS.includes(n));
-
-  // Collect all dates in range
   const dateSet = new Set();
-  names.forEach(name => {
-    assets[name].filter(d => d.date >= cut).forEach(d => dateSet.add(d.date));
-  });
+  names.forEach(name => assets[name].filter(d => d.date >= cut).forEach(d => dateSet.add(d.date)));
   const dates = [...dateSet].sort();
-
   if (!dates.length) return;
 
-  // Build datasets
   const datasets = names.map((name, i) => {
     const scoreMap = {};
     assets[name].filter(d => d.date >= cut).forEach(d => scoreMap[d.date] = d.score);
@@ -395,41 +237,15 @@ function renderChart(range) {
     return {
       label: name,
       data: dates.map(d => scoreMap[d] ?? null),
-      borderColor: color,
-      backgroundColor: color + '18',
-      tension: 0.35,
-      fill: false,
-      pointRadius: 3,
-      pointHoverRadius: 6,
-      pointBackgroundColor: color,
-      spanGaps: true,
-      order: 1,
+      borderColor: color, backgroundColor: color + '18',
+      tension: 0.35, fill: false,
+      pointRadius: 3, pointHoverRadius: 6, pointBackgroundColor: color,
+      spanGaps: true, order: 1,
     };
   });
 
-  // Reference lines
-  datasets.push({
-    label: '__ref3',
-    data: dates.map(() => 3),
-    borderColor: 'rgba(232,77,61,0.45)',
-    borderWidth: 1.5,
-    borderDash: [6, 4],
-    pointRadius: 0,
-    fill: false,
-    tension: 0,
-    order: 2,
-  });
-  datasets.push({
-    label: '__ref8',
-    data: dates.map(() => 8),
-    borderColor: 'rgba(107,114,128,0.4)',
-    borderWidth: 1.5,
-    borderDash: [6, 4],
-    pointRadius: 0,
-    fill: false,
-    tension: 0,
-    order: 2,
-  });
+  datasets.push({ label: '__ref3', data: dates.map(() => 3), borderColor: 'rgba(232,77,61,0.45)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false, tension: 0, order: 2 });
+  datasets.push({ label: '__ref8', data: dates.map(() => 8), borderColor: 'rgba(107,114,128,0.4)', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false, tension: 0, order: 2 });
 
   if (chart) chart.destroy();
   chart = new Chart(document.getElementById('mainChart'), {
@@ -441,22 +257,12 @@ function renderChart(range) {
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: {
-          position: 'top',
-          align: 'end',
-          labels: {
-            filter: item => !item.text.startsWith('__'),
-            boxWidth: 24,
-            boxHeight: 3,
-            padding: 16,
-            font: { size: 12 },
-            usePointStyle: false,
-          },
+          position: 'top', align: 'end',
+          labels: { filter: item => !item.text.startsWith('__'), boxWidth: 24, boxHeight: 3, padding: 16, font: { size: 12 }, usePointStyle: false },
         },
         tooltip: {
           filter: item => !item.dataset.label.startsWith('__'),
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y?.toFixed(2) ?? '—'}`,
-          },
+          callbacks: { label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y?.toFixed(2) ?? '—'}` },
         },
       },
       scales: {
@@ -468,39 +274,23 @@ function renderChart(range) {
         },
         x: {
           grid: { display: false },
-          ticks: {
-            font: { size: 11 }, color: '#999',
-            maxRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 10,
-          },
+          ticks: { font: { size: 11 }, color: '#999', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 },
         },
       },
     },
   });
 }
 
-// ── Utils ─────────────────────────────────────────────
-function clearData() {
-  if (!confirm('确认清除本地缓存？')) return;
-  localStorage.removeItem(LS_KEY);
-  rawData = null; assets = {};
-  document.getElementById('emptyState').style.display = '';
-  document.getElementById('dashboard').style.display  = 'none';
-  document.getElementById('latestDate').textContent   = '—';
-  showToast('缓存已清除');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
 function esc(s) {
   return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+// ── Auto-init ──────────────────────────────────────────
+assets = buildTimeSeries(RAW_POSTS);
+const allDates = Object.values(assets).flat().map(d => d.date).filter(Boolean).sort();
+document.getElementById('latestDate').textContent = allDates[allDates.length - 1] || '—';
+renderScoreCards();
+renderChart(curRange);
 </script>
 </body>
 </html>

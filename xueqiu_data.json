@@ -1,6 +1,6 @@
 {
   "user_id": "1811437308",
-  "fetched_at": "2026-08-13 17:41:41",
+  "fetched_at": "2026-08-13 18:10:31",
   "total": 20,
   "scored_count": 12,
   "posts": [
@@ -64,7 +64,7 @@
       ],
       "has_score": true,
       "avg_score": 5.68,
-      "likes": 6,
+      "likes": 7,
       "comments": 0,
       "reposts": 0
     },
