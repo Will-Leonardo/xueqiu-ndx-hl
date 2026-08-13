@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>量化大类资产打分走势</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:        #f0f2f5;
+  --card:      #ffffff;
+  --border:    #e8eaed;
+  --text:      #1a1a2e;
+  --muted:     #8c8c8c;
+  --c-red:     #e84d3d;
+  --c-orange:  #f97316;
+  --c-green:   #389e0d;
+  --c-blue:    #1677ff;
+  --c-purple:  #722ed1;
+  --c-red-bg:    #fff1f0;
+  --c-orange-bg: #fff7e6;
+  --c-green-bg:  #f6ffed;
+  --c-blue-bg:   #e6f4ff;
+  --c-purple-bg: #f9f0ff;
+  --asset-colors: #1677ff, #f97316, #389e0d, #722ed1, #13c2c2, #eb2f96;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+               "Hiragino Sans GB", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  padding: 32px 16px 48px;
+  color: var(--text);
+}
+
+/* ── Load bar (top) ────────────────────────── */
+.topbar {
+  max-width: 880px; margin: 0 auto 16px;
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.btn-load {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 14px;
+  font-size: 13px; color: var(--muted); cursor: pointer;
+  transition: all .15s;
+}
+.btn-load:hover { border-color: var(--c-blue); color: var(--c-blue); }
+#fileInput { display: none; }
+
+/* ── Main card ─────────────────────────────── */
+.card {
+  max-width: 880px; margin: 0 auto;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px 32px 32px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07);
+}
+
+/* ── Header ────────────────────────────────── */
+.card-title {
+  font-size: 22px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px; letter-spacing: -.01em;
+}
+.card-subtitle {
+  font-size: 13px; color: var(--muted); margin-bottom: 24px;
+}
+
+/* ── Score cards ───────────────────────────── */
+.scores-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.score-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px 14px;
+  min-height: 110px;
+}
+.score-asset {
+  font-size: 12px; color: var(--muted);
+  margin-bottom: 6px; letter-spacing: .01em;
+}
+.score-value {
+  font-size: 52px; font-weight: 800; line-height: 1;
+  margin-bottom: 10px; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+.score-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px; font-weight: 500;
+}
+.c-red    { color: var(--c-red);    }
+.c-orange { color: var(--c-orange); }
+.c-green  { color: var(--c-green);  }
+.c-blue   { color: var(--c-blue);   }
+.c-purple { color: var(--c-purple); }
+.bg-red    { background: var(--c-red-bg);    color: var(--c-red);    }
+.bg-orange { background: var(--c-orange-bg); color: var(--c-orange); }
+.bg-green  { background: var(--c-green-bg);  color: var(--c-green);  }
+.bg-blue   { background: var(--c-blue-bg);   color: var(--c-blue);   }
+.bg-purple { background: var(--c-purple-bg); color: var(--c-purple); }
+
+/* ── Legend bands ──────────────────────────── */
+.bands { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.band {
+  padding: 9px 16px; border-radius: 8px;
+  font-size: 14px; font-weight: 500;
+}
+.band-red    { background: var(--c-red-bg);    color: var(--c-red);    }
+.band-orange { background: var(--c-orange-bg); color: var(--c-orange); }
+.band-green  { background: var(--c-green-bg);  color: var(--c-green);  }
+.band-blue   { background: var(--c-blue-bg);   color: var(--c-blue);   }
+.band-purple { background: var(--c-purple-bg); color: var(--c-purple); }
+
+/* ── Warning note ──────────────────────────── */
+.note {
+  font-size: 12px; color: #d48806;
+  margin-bottom: 20px; display: flex; align-items: center; gap: 5px;
+}
+
+/* ── Time filter pills ─────────────────────── */
+.filter-row {
+  display: flex; gap: 8px; margin-bottom: 20px;
+}
+.pill {
+  padding: 7px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--muted); transition: all .15s;
+}
+.pill:hover { border-color: var(--c-blue); color: var(--c-blue); }
+.pill.active {
+  background: #1a3a5c; border-color: #1a3a5c; color: #fff;
+}
+
+/* ── Chart ─────────────────────────────────── */
+.chart-box { position: relative; height: 300px; }
+
+/* ── Empty state ───────────────────────────── */
+#emptyState {
+  text-align: center; padding: 48px 0;
+}
+#emptyState .empty-icon { font-size: 48px; margin-bottom: 12px; }
+#emptyState h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+#emptyState p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.steps-box {
+  background: var(--bg); border-radius: 10px;
+  padding: 16px 20px; text-align: left; margin: 20px auto;
+  max-width: 440px; font-size: 13px;
+}
+.steps-box .step { display: flex; gap: 10px; margin-bottom: 8px; color: #444; }
+.step-n {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--c-blue); color: #fff;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+code {
+  background: #eef0f2; padding: 1px 5px; border-radius: 3px; font-size: 12px;
+}
+.btn-pick {
+  display: inline-block; margin-top: 8px;
+  background: var(--c-blue); color: #fff;
+  border: none; border-radius: 8px;
+  padding: 10px 24px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .15s;
+}
+.btn-pick:hover { background: #0958d9; }
+
+/* ── Toast ─────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #1a1a2e; color: #fff;
+  padding: 10px 18px; border-radius: 10px;
+  font-size: 13px; z-index: 999;
+  opacity: 0; transform: translateY(6px);
+  transition: all .25s; pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ───────────────────────────── -->
+<div class="topbar">
+  <button class="btn-load" onclick="document.getElementById('fileInput').click()">
+    ＋ 加载 / 更新数据
+  </button>
+  <button class="btn-load" onclick="clearData()">清除缓存</button>
+  <input type="file" id="fileInput" accept=".json" onchange="handleFile(this)">
+</div>
+
+<!-- ── Main card ─────────────────────────── -->
+<div class="card">
+  <div class="card-title">量化大类资产打分走势</div>
+  <div class="card-subtitle">
+    数据来源：雪球 UID 1811437308 &nbsp;·&nbsp; 最新数据：<span id="latestDate">—</span>
+  </div>
+
+  <!-- Empty state (shown when no data) -->
+  <div id="emptyState">
+    <div class="empty-icon">📊</div>
+    <h3>暂无数据</h3>
+    <p>请先运行抓取脚本，然后加载生成的 JSON 文件</p>
+    <div class="steps-box">
+      <div class="step"><span class="step-n">1</span><span>安装依赖：<code>python3 -m pip install DrissionPage requests</code></span></div>
+      <div class="step"><span class="step-n">2</span><span>运行脚本：<code>python3 scrape_xueqiu.py</code></span></div>
+      <div class="step"><span class="step-n">3</span><span>点击下方按钮选择生成的 <code>xueqiu_data.json</code></span></div>
+    </div>
+    <button class="btn-pick" onclick="document.getElementById('fileInput').click()">📂 选择 JSON 文件</button>
+  </div>
+
+  <!-- Dashboard (shown when data loaded) -->
+  <div id="dashboard" style="display:none">
+    <!-- Current scores -->
+    <div class="scores-row" id="scoresRow"></div>
+
+    <!-- Legend bands -->
+    <div class="bands">
+      <div class="band band-red">≤ 3分 — 熊尾牛初，满仓/可加杠杆</div>
+      <div class="band band-orange">3–5分 — 熊市中期，累进加仓</div>
+      <div class="band band-green">5–7分 — 正常区间，持有观察</div>
+      <div class="band band-blue">7–8分 — 牛市中期，停止定投</div>
+      <div class="band band-purple">≥ 8分 — 牛市信号，累进减仓至空仓</div>
+    </div>
+
+    <div class="note">⚠ 分数越低代表估值越低、性价比越高</div>
+
+    <!-- Time filter -->
+    <div class="filter-row">
+      <button class="pill active" onclick="setRange('3m', this)">近3个月</button>
+      <button class="pill" onclick="setRange('1y', this)">近1年</button>
+      <button class="pill" onclick="setRange('all', this)">全部</button>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-box">
+      <canvas id="mainChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── Constants ────────────────────────────────────────
+const LS_KEY = 'xueqiu_1811437308_v2';
+const ASSET_COLORS = ['#1677ff','#f97316','#389e0d','#722ed1','#13c2c2','#eb2f96','#fa8c16','#52c41a'];
+// 只在页面展示这两个资产（其余数据仍保存在 JSON 里）
+const SHOW_ASSETS  = ['纳斯达克', '红利低波'];
+const BANDS = [
+  { max: 3,  cls: 'bg-red',    label: '熊尾牛初·满仓/可加杠杆' },
+  { max: 5,  cls: 'bg-orange', label: '熊市中期·累进加仓' },
+  { max: 7,  cls: 'bg-green',  label: '正常区间·持有观察' },
+  { max: 8,  cls: 'bg-blue',   label: '牛市中期·停止定投' },
+  { max: 999,cls: 'bg-purple', label: '牛市信号·累进减仓至空仓' },
+];
+const VALUE_CLS = ['c-red','c-orange','c-green','c-blue','c-purple'];
+
+let rawData  = null;   // full JSON from scraper
+let assets   = {};     // { assetName: [{date, score}] }
+let chart    = null;
+let curRange = '3m';
+
+// ── Boot ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved) {
+    try { init(JSON.parse(saved)); } catch { localStorage.removeItem(LS_KEY); }
+  }
+});
+
+// ── File loading ─────────────────────────────────────
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const json = JSON.parse(e.target.result);
+      if (!json.posts) throw new Error('缺少 posts 字段');
+      localStorage.setItem(LS_KEY, JSON.stringify(json));
+      init(json);
+      showToast(`✅ 加载成功，共 ${json.posts.length} 条帖子`);
+    } catch (err) {
+      showToast('❌ 文件格式错误：' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ── Init ─────────────────────────────────────────────
+function init(json) {
+  rawData = json;
+  assets  = buildTimeSeries(json.posts || []);
+
+  // Latest date
+  const allDates = Object.values(assets).flat().map(d => d.date).filter(Boolean).sort();
+  document.getElementById('latestDate').textContent = allDates[allDates.length - 1] || '—';
+
+  document.getElementById('emptyState').style.display  = 'none';
+  document.getElementById('dashboard').style.display   = '';
+
+  renderScoreCards();
+  renderChart(curRange);
+}
+
+// ── Build time series ─────────────────────────────────
+function buildTimeSeries(posts) {
+  const map = {};
+  posts.forEach(post => {
+    if (!post.scores || !post.scores.length || !post.date) return;
+    post.scores.forEach(s => {
+      const name = s.name;
+      const score = parseFloat(s.score);
+      if (isNaN(score)) return;
+      if (!map[name]) map[name] = [];
+      // avoid duplicate dates — keep latest entry
+      const existing = map[name].find(x => x.date === post.date);
+      if (existing) { existing.score = score; }
+      else { map[name].push({ date: post.date, score }); }
+    });
+  });
+  // sort each asset by date
+  Object.values(map).forEach(arr => arr.sort((a, b) => a.date.localeCompare(b.date)));
+  return map;
+}
+
+// ── Score info ────────────────────────────────────────
+function scoreInfo(s) {
+  const i = BANDS.findIndex(b => s <= b.max);
+  return { band: BANDS[i], cls: VALUE_CLS[i] };
+}
+
+// ── Current score cards ───────────────────────────────
+function renderScoreCards() {
+  const row = document.getElementById('scoresRow');
+  const names = Object.keys(assets).filter(n => SHOW_ASSETS.includes(n));
+
+  row.innerHTML = names.map(name => {
+    const series = assets[name];
+    const latest = series[series.length - 1];
+    if (!latest) return '';
+    const { band, cls } = scoreInfo(latest.score);
+    return `
+      <div class="score-card">
+        <div class="score-asset">${esc(name)}</div>
+        <div class="score-value ${cls}">${latest.score.toFixed(2)}</div>
+        <span class="score-chip ${band.cls}">${band.label}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Time range filter ─────────────────────────────────
+function setRange(range, btn) {
+  curRange = range;
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart(range);
+}
+
+function cutoffDate(range) {
+  const now = new Date();
+  if (range === '3m') { now.setMonth(now.getMonth() - 3); return now.toISOString().slice(0, 10); }
+  if (range === '1y') { now.setFullYear(now.getFullYear() - 1); return now.toISOString().slice(0, 10); }
+  return '0000-00-00';
+}
+
+// ── Chart ─────────────────────────────────────────────
+function renderChart(range) {
+  const cut = cutoffDate(range);
+  const names = Object.keys(assets).filter(n => SHOW_ASSETS.includes(n));
+
+  // Collect all dates in range
+  const dateSet = new Set();
+  names.forEach(name => {
+    assets[name].filter(d => d.date >= cut).forEach(d => dateSet.add(d.date));
+  });
+  const dates = [...dateSet].sort();
+
+  if (!dates.length) return;
+
+  // Build datasets
+  const datasets = names.map((name, i) => {
+    const scoreMap = {};
+    assets[name].filter(d => d.date >= cut).forEach(d => scoreMap[d.date] = d.score);
+    const color = ASSET_COLORS[i % ASSET_COLORS.length];
+    return {
+      label: name,
+      data: dates.map(d => scoreMap[d] ?? null),
+      borderColor: color,
+      backgroundColor: color + '18',
+      tension: 0.35,
+      fill: false,
+      pointRadius: 3,
+      pointHoverRadius: 6,
+      pointBackgroundColor: color,
+      spanGaps: true,
+      order: 1,
+    };
+  });
+
+  // Reference lines
+  datasets.push({
+    label: '__ref3',
+    data: dates.map(() => 3),
+    borderColor: 'rgba(232,77,61,0.45)',
+    borderWidth: 1.5,
+    borderDash: [6, 4],
+    pointRadius: 0,
+    fill: false,
+    tension: 0,
+    order: 2,
+  });
+  datasets.push({
+    label: '__ref8',
+    data: dates.map(() => 8),
+    borderColor: 'rgba(107,114,128,0.4)',
+    borderWidth: 1.5,
+    borderDash: [6, 4],
+    pointRadius: 0,
+    fill: false,
+    tension: 0,
+    order: 2,
+  });
+
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('mainChart'), {
+    type: 'line',
+    data: { labels: dates, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'end',
+          labels: {
+            filter: item => !item.text.startsWith('__'),
+            boxWidth: 24,
+            boxHeight: 3,
+            padding: 16,
+            font: { size: 12 },
+            usePointStyle: false,
+          },
+        },
+        tooltip: {
+          filter: item => !item.dataset.label.startsWith('__'),
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y?.toFixed(2) ?? '—'}`,
+          },
+        },
+      },
+      scales: {
+        y: {
+          min: 0, max: 10,
+          grid: { color: '#f0f0f0' },
+          ticks: { font: { size: 11 }, color: '#999', stepSize: 1 },
+          title: { display: true, text: '打分（越低估值越低）', font: { size: 11 }, color: '#999' },
+        },
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { size: 11 }, color: '#999',
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 10,
+          },
+        },
+      },
+    },
+  });
+}
+
+// ── Utils ─────────────────────────────────────────────
+function clearData() {
+  if (!confirm('确认清除本地缓存？')) return;
+  localStorage.removeItem(LS_KEY);
+  rawData = null; assets = {};
+  document.getElementById('emptyState').style.display = '';
+  document.getElementById('dashboard').style.display  = 'none';
+  document.getElementById('latestDate').textContent   = '—';
+  showToast('缓存已清除');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
