@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>量化大类资产打分走势</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
 <style>
 :root {
   --bg:        #f0f2f5;
@@ -263,6 +264,19 @@ function renderChart(range) {
         tooltip: {
           filter: item => !item.dataset.label.startsWith('__'),
           callbacks: { label: ctx => ` ${ctx.dataset.label}：${ctx.parsed.y?.toFixed(2) ?? '—'}` },
+        },
+        annotation: {
+          annotations: {
+            normalBand: {
+              type: 'box',
+              yMin: 4,
+              yMax: 7,
+              backgroundColor: 'rgba(24, 144, 255, 0.08)',
+              borderColor: 'rgba(24, 144, 255, 0.25)',
+              borderWidth: 1,
+              borderDash: [4, 3],
+            },
+          },
         },
       },
       scales: {
