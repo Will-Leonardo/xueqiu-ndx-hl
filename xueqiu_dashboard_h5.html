@@ -301,7 +301,6 @@ function renderScoreCards() {
 
 function cutoffDate(range) {
   const now = new Date();
-  if (range === '7d') { now.setDate(now.getDate() - 7);   return now.toISOString().slice(0, 10); }
   if (range === '3m') { now.setMonth(now.getMonth() - 3); return now.toISOString().slice(0, 10); }
   if (range === '1y') { now.setFullYear(now.getFullYear() - 1); return now.toISOString().slice(0, 10); }
   return '0000-00-00';
@@ -320,7 +319,8 @@ function renderCharts(range) {
     const validNames = names.filter(n => assets[n]);
     const dateSet = new Set();
     validNames.forEach(n => assets[n].filter(d => d.date >= cut).forEach(d => dateSet.add(d.date)));
-    const dates = [...dateSet].sort();
+    let dates = [...dateSet].sort();
+    if (range === '7d') dates = dates.slice(-7);
     if (!dates.length) return;
 
     const datasets = validNames.map((name, i) => {
