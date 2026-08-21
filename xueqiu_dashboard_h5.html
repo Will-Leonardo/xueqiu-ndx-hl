@@ -192,6 +192,7 @@ body {
     <button class="tab active" onclick="setRange('3m',this)">近3个月</button>
     <button class="tab" onclick="setRange('1y',this)">近1年</button>
     <button class="tab" onclick="setRange('all',this)">全部</button>
+    <button class="tab" onclick="setRange('7d',this)">近7天</button>
   </div>
 </section>
 
@@ -300,6 +301,7 @@ function renderScoreCards() {
 
 function cutoffDate(range) {
   const now = new Date();
+  if (range === '7d') { now.setDate(now.getDate() - 7);   return now.toISOString().slice(0, 10); }
   if (range === '3m') { now.setMonth(now.getMonth() - 3); return now.toISOString().slice(0, 10); }
   if (range === '1y') { now.setFullYear(now.getFullYear() - 1); return now.toISOString().slice(0, 10); }
   return '0000-00-00';
