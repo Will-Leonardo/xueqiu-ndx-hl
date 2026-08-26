@@ -1,0 +1,20 @@
+xueqiu_dashboard_h5.html
+  s_41a54cbd739536::t_c1fd7e12be2f36 180-182,184-205,208-210,214,220-222,226-227
+  s_41a54cbd739536::t_c148bb0caf988c 276-277
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1b04a88bb63641c59ba24ab63d70c64f5a6dc3c7",
+  "prompts": {},
+  "sessions": {
+    "s_41a54cbd739536": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c755f715-90fb-44b6-8d04-41880ca43beb",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "wangliangxin3 <wangliangxin3@jd.com>"
+    }
+  }
+}
