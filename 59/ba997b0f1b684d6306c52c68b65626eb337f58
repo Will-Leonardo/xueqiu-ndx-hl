@@ -1,0 +1,14 @@
+xueqiu_dashboard_h5.html
+  h_5dacde04cd93e6 279
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "59ba997b0f1b684d6306c52c68b65626eb337f58",
+  "prompts": {},
+  "humans": {
+    "h_5dacde04cd93e6": {
+      "author": "wangliangxin3 <wangliangxin3@jd.com>"
+    }
+  }
+}
