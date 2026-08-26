@@ -177,40 +177,55 @@ body {
 
 /* ── 打赏区 ──────────────────────── */
 .tip-section {
-  margin: 12px 12px 0;
-  background: #1a1a2e;
-  border-radius: 14px;
-  padding: 28px 20px 24px;
+  margin: 16px 0 0;
+  background: linear-gradient(160deg, #12122a 0%, #1e1b3a 60%, #0f1a2e 100%);
+  padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.tip-section::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.tip-eyebrow {
+  display: inline-block;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(167,139,250,0.8);
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-bottom: 14px;
 }
 .tip-text {
-  font-size: 13px; line-height: 1.8;
-  color: rgba(255,255,255,0.55);
-  margin-bottom: 20px;
+  font-size: 14px; line-height: 1.9;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 24px;
   letter-spacing: .02em;
 }
 .tip-text strong {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.9);
   font-weight: 600;
 }
 .qr-wrap {
   display: inline-block;
   background: #fff;
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
 }
 .qr-img {
   display: block;
-  width: 180px; height: 180px;
-  border-radius: 6px;
+  width: 240px; height: 240px;
+  border-radius: 8px;
   object-fit: cover;
-}
-.tip-tagline {
-  margin-top: 18px;
-  font-size: 15px; font-weight: 600;
-  color: rgba(255,255,255,0.7);
-  letter-spacing: .04em;
 }
 </style>
 </head>
@@ -258,11 +273,11 @@ body {
 </section>
 
 <section class="tip-section">
-  <p class="tip-text">长期跟踪，<strong>每日独立打分</strong><br>如果对你有帮助，欢迎请作者喝杯咖啡 ☕</p>
+  <div class="tip-eyebrow">每日独立打分 · 长期跟踪</div>
+  <p class="tip-text">如果内容对你有帮助<br>欢迎请作者喝杯咖啡 ☕</p>
   <div class="qr-wrap">
     <img src="qrcode.jpg" alt="打赏二维码" class="qr-img">
   </div>
-  <p class="tip-tagline">"祝您早日财富自由"</p>
 </section>
 
 <script>
