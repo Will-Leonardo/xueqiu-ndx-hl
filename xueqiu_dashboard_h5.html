@@ -174,6 +174,44 @@ body {
   font-size: 11px; color: #d48806;
   display: flex; align-items: center; gap: 4px;
 }
+
+/* ── 打赏区 ──────────────────────── */
+.tip-section {
+  margin: 12px 12px 0;
+  background: #1a1a2e;
+  border-radius: 14px;
+  padding: 28px 20px 24px;
+  text-align: center;
+}
+.tip-text {
+  font-size: 13px; line-height: 1.8;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 20px;
+  letter-spacing: .02em;
+}
+.tip-text strong {
+  color: rgba(255,255,255,0.85);
+  font-weight: 600;
+}
+.qr-wrap {
+  display: inline-block;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+.qr-img {
+  display: block;
+  width: 180px; height: 180px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.tip-tagline {
+  margin-top: 18px;
+  font-size: 15px; font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: .04em;
+}
 </style>
 </head>
 <body>
@@ -217,6 +255,14 @@ body {
     <div class="band-item band-purple"><span class="band-dot band-dot-purple"></span> ≥ 8分 — 牛市信号，累进减仓至空仓</div>
   </div>
   <div class="note-row">⚠ 分数越低代表估值越低、性价比越高</div>
+</section>
+
+<section class="tip-section">
+  <p class="tip-text">长期跟踪，<strong>每日独立打分</strong><br>如果对你有帮助，欢迎请作者喝杯咖啡 ☕</p>
+  <div class="qr-wrap">
+    <img src="qrcode.jpg" alt="打赏二维码" class="qr-img">
+  </div>
+  <p class="tip-tagline">"祝您早日财富自由"</p>
 </section>
 
 <script>
