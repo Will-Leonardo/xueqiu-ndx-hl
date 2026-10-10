@@ -1,0 +1,14 @@
+xueqiu_dashboard_h5.html
+  h_8f1cc2484afd6a 298-299,310-324
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1be895873b62398de8e9b0e2047c4f4713df380d",
+  "prompts": {},
+  "humans": {
+    "h_8f1cc2484afd6a": {
+      "author": "will <1418580404@qq.com>"
+    }
+  }
+}
